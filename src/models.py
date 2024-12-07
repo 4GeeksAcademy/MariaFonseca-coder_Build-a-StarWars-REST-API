@@ -9,8 +9,9 @@ class User(db.Model):
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
 
     def __repr__(self):
-        return '<User %r>' % self.username
+        return '<User %r>' % self.id
 
+# FORMA EN QUE DIGO QUE ME MUESTRE LOS DATOS DE UNA FORMA LEGIBLE:
     def serialize(self):
         return {
             "id": self.id,

@@ -11,6 +11,8 @@ from admin import setup_admin
 from models import db, User
 #from models import Person
 
+# ACÁ SOLO PARA CONFIGURAR LAS RUTAS
+
 app = Flask(__name__)
 app.url_map.strict_slashes = False
 
@@ -44,6 +46,8 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+# ACÁ ES DONDE SE AGREGAN ENDPOINTS
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
