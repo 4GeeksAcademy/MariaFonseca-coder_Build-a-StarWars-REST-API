@@ -40,6 +40,8 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
+# *****************************************************USER*******************************************************
+# ********TRAE TODOS LOS USER**********
 @app.route('/user', methods=['GET'])
 def get_all_users():
     try:
@@ -52,9 +54,23 @@ def get_all_users():
         return serialize_users, 200
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
+    
+# ********TRAE 1 USER POR ID**********
+@app.route('/user/<int:user_id>', methods=['GET'])
+def get_one_user(user_id):
+    try:
+        user = User.query.get(user_id)
+        if user is None:
+            return jsonify ({"msg":f"user {user_id} not found"}), 404
+        serialize_user = user.serialize()
+        return serialize_user, 200
+    except Exception as error: 
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
 
-
-
+# *****************************************************PEOPLE*******************************************************
+# *****************************************************PLANET*******************************************************
+# *****************************************************VEHICLE*******************************************************
+# *****************************************************FAVORITOS*******************************************************
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
