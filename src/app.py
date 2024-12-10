@@ -33,21 +33,27 @@ setup_admin(app)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
+# ACÁ ES DONDE SE AGREGAN ENDPOINTS
+
 # generate sitemap with all your endpoints
 @app.route('/')
 def sitemap():
     return generate_sitemap(app)
 
 @app.route('/user', methods=['GET'])
-def handle_hello():
+def get_all_users():
+    try:
+        # BUSCA DENTRO DEL MODELADO UNA TABLA QUE SE LLAME USERS.
+        users = User.query.all()
+        # SI TAMAÑO DE users ES MENOR QUE 1 (no hay usuarios) tendría que decir que no se encuentran:
+        if len(users)<1:
+            return jsonify({"msg": "There are no users on the list"}), 404
+        serialize_users = list (map(lambda x: x.serialize(), users))
+        return serialize_users, 200
+    except Exception as error: 
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
 
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
 
-    return jsonify(response_body), 200
-
-# ACÁ ES DONDE SE AGREGAN ENDPOINTS
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
