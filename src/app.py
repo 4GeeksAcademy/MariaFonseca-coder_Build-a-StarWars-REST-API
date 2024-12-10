@@ -1,7 +1,7 @@
 """
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
-import os
+import os, json
 from flask import Flask, request, jsonify, url_for
 from flask_migrate import Migrate
 from flask_swagger import swagger
@@ -64,6 +64,22 @@ def get_one_user(user_id):
             return jsonify ({"msg":f"user {user_id} not found"}), 404
         serialize_user = user.serialize()
         return serialize_user, 200
+    except Exception as error: 
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
+
+# ********CREAR USER**********
+@app.route('/user', methods=['POST'])
+def create_one_user():
+    try:
+        body = json.loads(request.data)
+        new_user = User (
+            email = body["email"],
+            password = body["password"],
+            is_active = True
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        return jsonify({"msg": "User has been created successfully"}), 201
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
 
