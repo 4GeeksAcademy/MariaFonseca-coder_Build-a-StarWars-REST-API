@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, People, Planet
+from models import db, User, People, Planet, Vehicle
 #from models import Person
 
 # ACÁ SOLO PARA CONFIGURAR LAS RUTAS
@@ -168,6 +168,45 @@ def create_one_planet():
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
 # *****************************************************VEHICLE*******************************************************
+# ********TRAE TODOS LOS VEHICULOS**********
+@app.route('/vehicles', methods=['GET'])
+def get_all_vehicles():
+    try:
+        vehicles = Vehicle.query.all()
+        if len(vehicles)<1:
+            return jsonify({"msg": "There are no vehicles on the list"}), 404
+        serialize_vehicles = list (map(lambda x: x.serialize(), vehicles))
+        return serialize_vehicles, 200
+    except Exception as error: 
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
+    
+# ********TRAE 1 VEHICULO POR ID**********
+@app.route('/vehicles/<int:vehicle_id>', methods=['GET'])
+def get_one_vehicle(vehicle_id):
+    try:
+        vehicle = Vehicle.query.get(vehicle_id)
+        if vehicle is None:
+            return jsonify ({"msg":f"Vehicle {vehicle_id} not found"}), 404
+        serialize_vehicle = vehicle.serialize()
+        return serialize_vehicle, 200
+    except Exception as error:
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
+    
+# ********CREAR VEHICULO**********
+@app.route('/vehicles', methods=['POST'])
+def create_one_vehicle():
+    try:
+        body = json.loads(request.data)
+        new_vehicle = Vehicle (
+            name = body["name"],
+            cargo_capacity = body["cargo_capacity"],
+            length = body["length"]
+        )
+        db.session.add(new_vehicle)
+        db.session.commit()
+        return jsonify({"msg": "Vehicle has been created successfully"}), 201
+    except Exception as error: 
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
 # *****************************************************FAVORITOS*******************************************************
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
