@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, People
+from models import db, User, People, Planet
 #from models import Person
 
 # ACÁ SOLO PARA CONFIGURAR LAS RUTAS
@@ -125,7 +125,48 @@ def create_one_people():
         return jsonify({"msg": "Character has been created successfully"}), 201
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
+    
 # *****************************************************PLANET*******************************************************
+# ********TRAE TODOS LOS PLANETAS**********
+@app.route('/planets', methods=['GET'])
+def get_all_planets():
+    try:
+        planets = Planet.query.all()
+        # SI TAMAÑO DE users ES MENOR QUE 1 (no hay usuarios) tendría que decir que no se encuentran:
+        if len(planets)<1:
+            return jsonify({"msg": "There are no characters on the list"}), 404
+        serialize_planets = list (map(lambda x: x.serialize(), planets))
+        return serialize_planets, 200
+    except Exception as error: 
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
+    
+# ********TRAE 1 PLANETA POR ID**********
+@app.route('/planets/<int:planet_id>', methods=['GET'])
+def get_one_planet(planet_id):
+    try:
+        planet = Planet.query.get(planet_id)
+        if planet is None:
+            return jsonify ({"msg":f"Planet {planet_id} not found"}), 404
+        serialize_planet = planet.serialize()
+        return serialize_planet, 200
+    except Exception as error:
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
+
+# ********CREAR PLANETA**********
+@app.route('/planets', methods=['POST'])
+def create_one_planet():
+    try:
+        body = json.loads(request.data)
+        new_planet = Planet (
+            name = body["name"],
+            population = body["population"],
+            climate = body["climate"]
+        )
+        db.session.add(new_planet)
+        db.session.commit()
+        return jsonify({"msg": "Planet has been created successfully"}), 201
+    except Exception as error: 
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
 # *****************************************************VEHICLE*******************************************************
 # *****************************************************FAVORITOS*******************************************************
 # this only runs if `$ python src/app.py` is executed
