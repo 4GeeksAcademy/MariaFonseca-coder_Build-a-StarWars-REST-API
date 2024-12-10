@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, People
 #from models import Person
 
 # ACÁ SOLO PARA CONFIGURAR LAS RUTAS
@@ -45,7 +45,7 @@ def sitemap():
 @app.route('/user', methods=['GET'])
 def get_all_users():
     try:
-        # BUSCA DENTRO DEL MODELADO UNA TABLA QUE SE LLAME USERS.
+        # BUSCA DENTRO DEL MODELADO UNA TABLA QUE SE LLAME USER.
         users = User.query.all()
         # SI TAMAÑO DE users ES MENOR QUE 1 (no hay usuarios) tendría que decir que no se encuentran:
         if len(users)<1:
@@ -84,6 +84,47 @@ def create_one_user():
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
 
 # *****************************************************PEOPLE*******************************************************
+# ********TRAE TODOS LOS PERSONAJES**********
+@app.route('/people', methods=['GET'])
+def get_all_people():
+    try:
+        # BUSCA DENTRO DEL MODELADO UNA TABLA QUE SE LLAME USERS.
+        people = People.query.all()
+        # SI TAMAÑO DE users ES MENOR QUE 1 (no hay usuarios) tendría que decir que no se encuentran:
+        if len(people)<1:
+            return jsonify({"msg": "There are no characters on the list"}), 404
+        serialize_people = list (map(lambda x: x.serialize(), people))
+        return serialize_people, 200
+    except Exception as error: 
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
+    
+# ********TRAE 1 PERSONAJE POR ID**********
+@app.route('/people/<int:people_id>', methods=['GET'])
+def get_one_people(people_id):
+    try:
+        people = People.query.get(people_id)
+        if people is None:
+            return jsonify ({"msg":f"Character {people_id} not found"}), 404
+        serialize_people = people.serialize()
+        return serialize_people, 200
+    except Exception as error:
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
+    
+# ********CREAR PERSONAJE**********
+@app.route('/people', methods=['POST'])
+def create_one_people():
+    try:
+        body = json.loads(request.data)
+        new_people = People (
+            name = body["name"],
+            gender = body["gender"],
+            hair_color = body["hair_color"]
+        )
+        db.session.add(new_people)
+        db.session.commit()
+        return jsonify({"msg": "Character has been created successfully"}), 201
+    except Exception as error: 
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
 # *****************************************************PLANET*******************************************************
 # *****************************************************VEHICLE*******************************************************
 # *****************************************************FAVORITOS*******************************************************
