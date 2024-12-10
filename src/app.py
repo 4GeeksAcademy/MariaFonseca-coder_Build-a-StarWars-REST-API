@@ -83,14 +83,12 @@ def create_one_user():
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
 
-# *****************************************************PEOPLE*******************************************************
+# **************************************************************PEOPLE*****************************************************************
 # ********TRAE TODOS LOS PERSONAJES**********
 @app.route('/people', methods=['GET'])
 def get_all_people():
     try:
-        # BUSCA DENTRO DEL MODELADO UNA TABLA QUE SE LLAME USERS.
         people = People.query.all()
-        # SI TAMAÑO DE users ES MENOR QUE 1 (no hay usuarios) tendría que decir que no se encuentran:
         if len(people)<1:
             return jsonify({"msg": "There are no characters on the list"}), 404
         serialize_people = list (map(lambda x: x.serialize(), people))
@@ -126,13 +124,12 @@ def create_one_people():
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
     
-# *****************************************************PLANET*******************************************************
+# **************************************************************PLANET*********************************************************************
 # ********TRAE TODOS LOS PLANETAS**********
 @app.route('/planets', methods=['GET'])
 def get_all_planets():
     try:
         planets = Planet.query.all()
-        # SI TAMAÑO DE users ES MENOR QUE 1 (no hay usuarios) tendría que decir que no se encuentran:
         if len(planets)<1:
             return jsonify({"msg": "There are no characters on the list"}), 404
         serialize_planets = list (map(lambda x: x.serialize(), planets))
@@ -167,7 +164,7 @@ def create_one_planet():
         return jsonify({"msg": "Planet has been created successfully"}), 201
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
-# *****************************************************VEHICLE*******************************************************
+# *****************************************************************VEHICLE*****************************************************************
 # ********TRAE TODOS LOS VEHICULOS**********
 @app.route('/vehicles', methods=['GET'])
 def get_all_vehicles():
@@ -207,7 +204,9 @@ def create_one_vehicle():
         return jsonify({"msg": "Vehicle has been created successfully"}), 201
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
-# *****************************************************FAVORITOS*******************************************************
+    
+# ***************************************************************FAVORITOS***********************************************************************
+
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3000))
