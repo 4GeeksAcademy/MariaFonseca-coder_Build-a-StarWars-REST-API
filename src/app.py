@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User, People, Planet, Vehicle
+from models import db, User, People, Planet, Vehicle, Favoritos
 #from models import Person
 
 # ACÁ SOLO PARA CONFIGURAR LAS RUTAS
@@ -206,6 +206,18 @@ def create_one_vehicle():
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
     
 # ***************************************************************FAVORITOS***********************************************************************
+# ********TRAE TODOS LOS FAVORITOS DE UN USUARIO EN ESPECÍFICO**********
+@app.route('/user/<int:user_id>/favorites', methods=['GET'])
+def get_favorites_of_user_id(user_id):
+    try:
+        favorites = Favoritos.query.filter_by(user_id = user_id).all()
+        if len(favorites)<1:
+            return jsonify({"msg": "There are no favorites on the list"}), 404
+        serialize_favorites = list (map(lambda x: x.serialize(), favorites))
+        return serialize_favorites, 200
+    except Exception as error: 
+        return jsonify ({"msg":"Server error", "error": str(error)}), 500
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
