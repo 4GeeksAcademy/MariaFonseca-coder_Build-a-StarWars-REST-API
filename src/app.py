@@ -218,6 +218,62 @@ def get_favorites_of_user_id(user_id):
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
 
+# ********CREAR VEHICULO FAVORITO**********
+@app.route('/favorite/vehicle/<int:vehicle_id>/<int:user_id>', methods=['POST'])
+def create_favorite_vehicle(vehicle_id, user_id):
+    try:
+        if Favoritos.query.filter_by(user_id = user_id,vehicle_id=vehicle_id).first():
+            return jsonify({"msg": f"Vehicle {vehicle_id} ya está agregago a favoritos"}), 404
+
+        new_favorite_vehicle = Favoritos(
+            user_id=user_id,
+            vehicle_id=vehicle_id
+        )
+        db.session.add(new_favorite_vehicle)
+        db.session.commit()
+
+        return jsonify({"msg": "Favorite Vehicle has been created successfully"}), 201
+    except Exception as error:
+        return jsonify({"msg": "Server error", "error": str(error)}), 500
+    
+# ********CREAR PEOPLE FAVORITO**********
+@app.route('/favorite/people/<int:people_id>/<int:user_id>', methods=['POST'])
+def create_favorite_people(people_id, user_id):
+    try:
+        if Favoritos.query.filter_by(user_id = user_id,people_id=people_id).first():
+            return jsonify({"msg": f"People {people_id} ya está agregago a favoritos"}), 404
+
+        new_favorite_people = Favoritos(
+            user_id=user_id,
+            people_id=people_id
+        )
+        db.session.add(new_favorite_people)
+        db.session.commit()
+
+        return jsonify({"msg": "Favorite Character has been created successfully"}), 201
+    except Exception as error:
+        return jsonify({"msg": "Server error", "error": str(error)}), 500
+
+# ********CREAR PLANETA FAVORITO**********
+@app.route('/favorite/planet/<int:planet_id>/<int:user_id>', methods=['POST'])
+def create_favorite_planet(planet_id, user_id):
+    try:
+        if Favoritos.query.filter_by(user_id = user_id,planet_id=planet_id).first():
+            return jsonify({"msg": f"Planet {planet_id} ya está agregago a favoritos"}), 404
+
+        new_favorite_planet = Favoritos(
+            user_id=user_id,
+            planet_id=planet_id
+        )
+        db.session.add(new_favorite_planet)
+        db.session.commit()
+
+        return jsonify({"msg": "Favorite Planet has been created successfully"}), 201
+    except Exception as error:
+        return jsonify({"msg": "Server error", "error": str(error)}), 500
+
+
+
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
