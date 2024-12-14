@@ -52,7 +52,7 @@ def get_all_users():
             return jsonify({"msg": "There are no users on the list"}), 404
         serialize_users = list (map(lambda x: x.serialize(), users))
         return serialize_users, 200
-    except Exception as error: 
+    except Exception as error:
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
     
 # ********TRAE 1 USER POR ID**********
@@ -82,6 +82,24 @@ def create_one_user():
         return jsonify({"msg": "User has been created successfully"}), 201
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
+
+# ********ACTUALIZA USER POR ID**********
+@app.route('/edit/user/<int:user_id>', methods=['PUT'])
+def update_one_user(user_id):
+    try:
+        user = User.query.get(user_id)
+        if user is None:
+            return jsonify({"msg": f"User {user_id} not found"}), 404
+
+        body = request.get_json()
+        user.email = body.get("email", user.email)
+        user.password = body.get("password", user.password)
+        
+        db.session.commit()
+        return user.serialize(), 200
+
+    except Exception as error:
+        return jsonify({"msg": "Server error", "error": str(error)}), 500
 
 # **************************************************************PEOPLE*****************************************************************
 # ********TRAE TODOS LOS PERSONAJES**********
@@ -123,6 +141,25 @@ def create_one_people():
         return jsonify({"msg": "Character has been created successfully"}), 201
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
+
+# ********ACTUALIZA PERSONAJE POR ID**********
+@app.route('/edit/people/<int:people_id>', methods=['PUT'])
+def update_one_people(people_id):
+    try:
+        people = People.query.get(people_id)
+        if people is None:
+            return jsonify({"msg": f"People {people_id} not found"}), 404
+
+        body = request.get_json()
+        people.name = body.get("name", people.name)
+        people.gender = body.get("gender", people.gender)
+        people.hair_color = body.get("hair_color", people.hair_color)
+
+        db.session.commit()
+        return people.serialize(), 200
+
+    except Exception as error:
+        return jsonify({"msg": "Server error", "error": str(error)}), 500
     
 # **************************************************************PLANET*********************************************************************
 # ********TRAE TODOS LOS PLANETAS**********
@@ -164,6 +201,26 @@ def create_one_planet():
         return jsonify({"msg": "Planet has been created successfully"}), 201
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
+
+# ********ACTUALIZA PLANET POR ID**********
+@app.route('/planet/<int:planet_id>', methods=['PUT'])
+def update_one_planet(planet_id):
+    try:
+        planet = Planet.query.get(planet_id)
+        if planet is None:
+            return jsonify({"msg": f"Planet {planet_id} not found"}), 404
+
+        body = request.get_json()
+        planet.name = body.get("name", planet.name)
+        planet.population = body.get("population", planet.population)
+        planet.climate = body.get("climate", planet.climate)
+
+        db.session.commit()
+        return planet.serialize(), 200
+
+    except Exception as error:
+        return jsonify({"msg": "Server error", "error": str(error)}), 500
+    
 # *****************************************************************VEHICLE*****************************************************************
 # ********TRAE TODOS LOS VEHICULOS**********
 @app.route('/vehicles', methods=['GET'])
@@ -205,15 +262,38 @@ def create_one_vehicle():
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
     
+# ********ACTUALIZA VEHICULO POR ID**********
+@app.route('/edit/vehicle/<int:vehicle_id>', methods=['PUT'])
+def update_one_vehicle(vehicle_id):
+    try:
+        vehicle = Vehicle.query.get(vehicle_id)
+        if vehicle is None:
+            return jsonify({"msg": f"Vehicle {vehicle_id} not found"}), 404
+
+        body = request.get_json()
+        vehicle.name = body.get("name", vehicle.name)
+        vehicle.cargo_capacity = body.get("cargo_capacity", vehicle.cargo_capacity)
+        vehicle.length = body.get("length", vehicle.length)
+
+        db.session.commit()
+        return vehicle.serialize(), 200
+
+    except Exception as error:
+        return jsonify({"msg": "Server error", "error": str(error)}), 500
+    
 # ***************************************************************FAVORITOS***********************************************************************
 # ********TRAE TODOS LOS FAVORITOS DE UN USUARIO EN ESPECÍFICO**********
 @app.route('/user/<int:user_id>/favorites', methods=['GET'])
 def get_favorites_of_user_id(user_id):
     try:
-        favorites = Favoritos.query.filter_by(user_id = user_id).all()
-        if len(favorites)<1:
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({"msg": "The user dont exist"}), 404
+
+        if len(user.favorites)<1:
             return jsonify({"msg": "There are no favorites on the list"}), 404
-        serialize_favorites = list (map(lambda x: x.serialize(), favorites))
+        serialize_favorites = user.serialize_favorites()
         return serialize_favorites, 200
     except Exception as error: 
         return jsonify ({"msg":"Server error", "error": str(error)}), 500
@@ -322,9 +402,8 @@ def delete_favorite_people(people_id, user_id):
 
     except Exception as error:
         return jsonify({"msg": "Server error", "error": str(error)}), 500
-
-
-
+    
+    
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
