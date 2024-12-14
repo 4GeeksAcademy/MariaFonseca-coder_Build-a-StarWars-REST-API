@@ -301,7 +301,24 @@ def delete_favorite_planet(planet_id, user_id):
         db.session.delete(elimate_favorite_planet)
         db.session.commit()
 
-        return jsonify({"msg": f"Vehicle {planet_id} eliminado de los favoritos exitosamente"}), 200
+        return jsonify({"msg": f"Planet {planet_id} eliminado de los favoritos exitosamente"}), 200
+
+    except Exception as error:
+        return jsonify({"msg": "Server error", "error": str(error)}), 500
+
+#****************ELIMINAR PEOPLE FAVORITO POR ID*******************
+@app.route('/favorite/people/<int:people_id>/<int:user_id>', methods=['DELETE'])
+def delete_favorite_people(people_id, user_id):
+    try:
+        elimate_favorite_people = Favoritos.query.filter_by(user_id=user_id, people_id=people_id).first()
+        
+        if not elimate_favorite_people:
+            return jsonify({"msg": f"People {people_id} no se encuentra en los favoritos del usuario {user_id}"}), 404
+
+        db.session.delete(elimate_favorite_people)
+        db.session.commit()
+
+        return jsonify({"msg": f"People {people_id} eliminado de los favoritos exitosamente"}), 200
 
     except Exception as error:
         return jsonify({"msg": "Server error", "error": str(error)}), 500
